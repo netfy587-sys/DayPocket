@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boxing — The Sweet Science</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --canvas:#EDE6D6;
+    --canvas-dim:#E1D8C3;
+    --ink:#1A1512;
+    --ink-soft:#463D34;
+    --oxblood:#7A2426;
+    --oxblood-light:#9A3F3B;
+    --brass:#A6812E;
+    --charcoal:#241E1A;
+    --line:rgba(26,21,18,0.16);
+    --line-on-dark:rgba(237,230,214,0.2);
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:'Libre Franklin', sans-serif;
+    line-height:1.65;
+  }
+  h1,h2,h3,.stat-num,.round-tag,.corner-num{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    letter-spacing:0.01em;
+  }
+  img{max-width:100%; display:block;}
+  .wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 clamp(1.25rem, 4vw, 3rem);
+  }
+
+  /* ropes divider: three thin lines like ring ropes */
+  .ropes{
+    height:14px;
+    background:
+      repeating-linear-gradient(180deg,
+        var(--oxblood) 0px, var(--oxblood) 2px,
+        transparent 2px, transparent 6px);
+    opacity:0.85;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    padding:1.5rem clamp(1.25rem,4vw,3rem);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:var(--canvas);
+    position:relative;
+    z-index:5;
+  }
+  .topbar .mark{
+    font-size:1.15rem;
+  }
+  .topbar .sub{
+    font-size:0.8rem;
+    color:rgba(237,230,214,0.7);
+    font-style:italic;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    background:var(--charcoal);
+    overflow:hidden;
+  }
+  .hero-media{
+    position:relative;
+    height:min(80vh, 660px);
+    min-height:440px;
+  }
+  .hero-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 25%;
+    filter:grayscale(15%) contrast(1.05);
+    opacity:0.68;
+  }
+  .hero-media::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(36,30,26,0.25) 0%, rgba(36,30,26,0.55) 55%, var(--charcoal) 100%);
+  }
+  .hero-text{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:0 clamp(1.25rem,4vw,3rem) 2.4rem;
+  }
+  .hero-text-inner{
+    max-width:var(--maxw);
+    margin:0 auto;
+    animation:riseIn 900ms ease-out both;
+  }
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(18px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .hero h1{
+    color:var(--canvas);
+    font-size:clamp(3.2rem, 10vw, 7rem);
+    margin:0 0 0.5rem;
+    line-height:0.9;
+    text-transform:uppercase;
+  }
+  .hero p.lede{
+    font-family:'Libre Franklin', sans-serif;
+    font-size:clamp(1.05rem, 2vw, 1.3rem);
+    max-width:36ch;
+    color:rgba(237,230,214,0.82);
+    margin:0;
+    font-style:italic;
+  }
+  .hero-credit{
+    font-size:0.75rem;
+    color:rgba(237,230,214,0.5);
+    margin-top:0.9rem;
+    font-style:italic;
+  }
+
+  .stat-strip{
+    background:var(--charcoal);
+    border-top:1px solid var(--line-on-dark);
+  }
+  .stat-strip .wrap{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+  }
+  .stat{
+    padding:1.7rem 1rem;
+    text-align:center;
+    border-left:1px solid var(--line-on-dark);
+  }
+  .stat:first-child{border-left:none;}
+  .stat-num{
+    color:var(--canvas);
+    font-size:clamp(1.7rem,3.8vw,2.5rem);
+    line-height:1;
+  }
+  .stat-label{
+    color:rgba(237,230,214,0.65);
+    font-size:0.8rem;
+    margin-top:0.5rem;
+    font-style:italic;
+  }
+
+  /* ---------- sections ---------- */
+  section{padding:clamp(3.5rem,7vw,6rem) 0;}
+  h2{
+    font-size:clamp(2rem, 4.4vw, 3rem);
+    text-transform:uppercase;
+    margin:0 0 1.3rem;
+    line-height:1.02;
+    color:var(--ink);
+  }
+  .section-intro{
+    max-width:60ch;
+    font-size:1.08rem;
+    color:var(--ink-soft);
+  }
+  .prose{max-width:66ch; font-size:1.03rem;}
+  .prose p{margin:0 0 1.1rem;}
+  .prose p:last-child{margin-bottom:0;}
+
+  .split{
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:clamp(2rem,5vw,4rem);
+    align-items:center;
+  }
+  .split.reverse .split-media{order:2;}
+  .split.reverse .split-text{order:1;}
+  .split-media img{
+    width:100%;
+    height:clamp(280px,38vw,430px);
+    object-fit:cover;
+  }
+  figcaption{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin-top:0.6rem;
+    font-style:italic;
+  }
+  @media (max-width: 820px){
+    .split, .split.reverse{grid-template-columns:1fr;}
+    .split-media, .split.reverse .split-media{order:1;}
+    .split-text, .split.reverse .split-text{order:2;}
+  }
+
+  /* ---------- dark section ---------- */
+  .dark-section{
+    background:var(--charcoal);
+    color:var(--canvas);
+  }
+  .dark-section h2{color:var(--canvas);}
+  .dark-section .section-intro{color:rgba(237,230,214,0.72);}
+  .dark-section .prose{color:rgba(237,230,214,0.85);}
+  .dark-section figcaption{color:rgba(237,230,214,0.55);}
+
+  /* rounds timeline for history */
+  .rounds-list{
+    margin-top:2.2rem;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    border-top:1px solid var(--line-on-dark);
+  }
+  .round-row{
+    display:grid;
+    grid-template-columns:90px 1fr;
+    gap:1.4rem;
+    padding:1.3rem 0;
+    border-bottom:1px solid var(--line-on-dark);
+    align-items:baseline;
+  }
+  .round-tag{
+    color:var(--brass);
+    font-size:1.15rem;
+  }
+  .round-row p{margin:0; color:rgba(237,230,214,0.85); font-size:0.98rem;}
+  @media (max-width:600px){
+    .round-row{grid-template-columns:1fr;}
+  }
+
+  /* rules / bout mechanics grid */
+  .grid-cells{
+    margin-top:2.2rem;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    border-top:1px solid var(--line);
+    border-left:1px solid var(--line);
+  }
+  .cell{
+    padding:1.6rem clamp(1.1rem,2.4vw,1.8rem);
+    border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .cell h3{
+    font-size:1rem;
+    text-transform:uppercase;
+    margin:0 0 0.5rem;
+    color:var(--oxblood);
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+  }
+  .cell p{margin:0; font-size:0.95rem; color:var(--ink-soft);}
+  @media (max-width:900px){.grid-cells{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.grid-cells{grid-template-columns:1fr;}}
+
+  /* weight classes strip */
+  .weights{
+    margin-top:2.2rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.7rem;
+  }
+  .weight-chip{
+    border:1.5px solid var(--ink);
+    padding:0.5rem 1rem;
+    font-size:0.9rem;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .weight-chip b{font-family:'Anton', sans-serif; font-weight:400; margin-right:0.35rem;}
+
+  /* gallery */
+  .gallery{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:1.2rem;
+    margin-top:2.5rem;
+  }
+  .gallery img{width:100%; height:100%; object-fit:cover;}
+  .gallery figure{margin:0; height:100%;}
+  .gallery-tall{height:clamp(320px,42vw,460px);}
+  @media (max-width:820px){
+    .gallery{grid-template-columns:1fr;}
+    .gallery-tall{height:280px;}
+  }
+
+  /* closing */
+  .closing{
+    background:var(--ink);
+    color:rgba(237,230,214,0.85);
+  }
+  .closing h2{color:var(--canvas);}
+  .closing .prose{color:rgba(237,230,214,0.8); max-width:60ch;}
+  .closing .prose strong{color:var(--canvas);}
+
+  footer{
+    background:var(--ink);
+    border-top:1px solid var(--line-on-dark);
+    color:rgba(237,230,214,0.5);
+    font-size:0.8rem;
+    padding:2rem 0 2.6rem;
+  }
+  footer .wrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.5rem 1.5rem;
+    justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="topbar">
+    <span class="mark">Boxing</span>
+    <span class="sub">the sweet science</span>
+  </div>
+  <div class="hero-media">
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Boxing_match_%2811327913624%29.jpg"
+         alt="Two boxers exchange punches in the ring during a match"
+         loading="eager">
+    <div class="hero-text">
+      <div class="hero-text-inner">
+        <h1>Boxing</h1>
+        <p class="lede">Two people, two fists each, and nowhere to hide for three minutes at a time. Nothing about it has changed in the way that matters since it began.</p>
+        <p class="hero-credit">Photo via Wikimedia Commons</p>
+      </div>
+    </div>
+  </div>
+  <div class="stat-strip">
+    <div class="wrap">
+      <div class="stat">
+        <div class="stat-num">~4,000</div>
+        <div class="stat-label">years since the earliest recorded bouts</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3 min</div>
+        <div class="stat-label">the length of a standard round</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">17</div>
+        <div class="stat-label">recognised weight classes today</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ropes"></div>
+
+<section>
+  <div class="wrap">
+    <h2>The idea, stripped down</h2>
+    <p class="section-intro">Take away the entrance music and the title belts, and boxing is one of the plainest sports there is: hit your opponent cleanly, don't get hit back, and try to be the one still standing when the bell goes.</p>
+    <div class="prose" style="margin-top:1.6rem;">
+      <p>A boxing match, or bout, is fought between two competitors of roughly the same weight, in a roped-off platform called a ring, using only their fists — and only their gloved fists — to score points or force a stoppage. Rounds are timed, breaks between them are short, and a fight ends one of four ways: by decision on the judges' scorecards, by knockout, by the referee stepping in to stop it, or by a boxer's own corner throwing in the towel.</p>
+      <p>It's sometimes called "the sweet science," a phrase that sounds like a contradiction until you actually watch a good bout closely. Underneath the punching is a constant, almost mathematical calculation of range, timing, and angle — which is exactly why the best boxers are so often the ones throwing the fewest wild punches, not the most.</p>
+    </div>
+  </div>
+</section>
+
+<div class="ropes"></div>
+
+<section class="dark-section">
+  <div class="wrap">
+    <div class="split">
+      <div class="split-text">
+        <h2>A history with no clean start</h2>
+        <div class="prose">
+          <p>Depictions of men fighting bare-fisted, sometimes with their hands wrapped in leather straps, show up on Sumerian relief carvings and Egyptian tomb paintings from around 3000 BCE — making boxing one of the oldest sports for which there's any physical evidence at all. The Greeks made it an Olympic event in 688 BCE under the name pygmachia, fought with leather hand-wraps called himantes rather than padded gloves, and took it seriously enough to leave behind statues like the Boxer at Rest, a bronze so worn at the hands and feet from centuries of being touched that it was clearly treated as something close to sacred.</p>
+          <p>The sport nearly disappeared in Europe for over a thousand years before resurfacing in eighteenth-century England as bare-knuckle prizefighting, fought under increasingly formal rules. The London Prize Ring Rules of 1743 introduced the idea of a round ending when a man went down. Then, in 1867, the Marquess of Queensberry Rules brought in padded gloves, three-minute rounds, and a ten-second count — the framework the modern sport still runs on.</p>
+        </div>
+        <div class="rounds-list">
+          <div class="round-row"><span class="round-tag">c. 3000 BCE</span><p>Earliest known depictions of fist-fighting, Egypt and Mesopotamia</p></div>
+          <div class="round-row"><span class="round-tag">688 BCE</span><p>Boxing enters the ancient Olympic Games as pygmachia</p></div>
+          <div class="round-row"><span class="round-tag">1743</span><p>The London Prize Ring Rules formalise bare-knuckle bouts in England</p></div>
+          <div class="round-row"><span class="round-tag">1867</span><p>The Queensberry Rules introduce gloves and timed rounds</p></div>
+          <div class="round-row"><span class="round-tag">1904</span><p>Boxing joins the modern Olympic programme</p></div>
+        </div>
+      </div>
+      <div class="split-media">
+        <figure>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/The_Boxer_At_Rest_Rome.jpg"
+               alt="The Boxer at Rest, a Hellenistic Greek bronze statue of a seated boxer wearing leather hand-wraps"
+               loading="lazy">
+          <figcaption>Boxer at Rest, a Hellenistic Greek bronze from around 330–50 BCE, still shown wearing leather himantes. Photo: Wikimedia Commons</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ropes"></div>
+
+<section>
+  <div class="wrap">
+    <h2>How a bout is actually decided</h2>
+    <p class="section-intro">Most fights don't end in a knockout — they go the distance, and someone has to make the call on paper.</p>
+    <div class="grid-cells">
+      <div class="cell">
+        <h3>Rounds</h3>
+        <p>Professional bouts run up to 12 rounds of three minutes each, with a one-minute rest between. Amateur and Olympic bouts are shorter, usually three rounds of three minutes.</p>
+      </div>
+      <div class="cell">
+        <h3>Scoring</h3>
+        <p>Three judges score every round separately, awarding points for clean punches landed, ring control, and defence. Whoever wins more rounds on more scorecards wins the fight.</p>
+      </div>
+      <div class="cell">
+        <h3>Knockout</h3>
+        <p>If a boxer is knocked down and can't get up — or isn't fit to continue — within a ten-second count, the fight ends immediately, no scorecards needed.</p>
+      </div>
+      <div class="cell">
+        <h3>Technical knockout</h3>
+        <p>A referee or ringside doctor can stop a fight at any point if one boxer is taking too much punishment to continue safely, even if they're still on their feet.</p>
+      </div>
+      <div class="cell">
+        <h3>The corner</h3>
+        <p>Each boxer has a team in their corner between rounds — a trainer giving instructions, a cutman treating cuts and swelling, and someone with a towel, ready to end the fight if it's gone too far.</p>
+      </div>
+      <div class="cell">
+        <h3>Weight classes</h3>
+        <p>Fighters compete against opponents close to their own body weight, from flyweight up past heavyweight, so a size mismatch never decides a bout before it starts.</p>
+      </div>
+    </div>
+    <div class="weights">
+      <span class="weight-chip"><b>Flyweight</b>up to 51 kg</span>
+      <span class="weight-chip"><b>Featherweight</b>up to 57 kg</span>
+      <span class="weight-chip"><b>Lightweight</b>up to 61 kg</span>
+      <span class="weight-chip"><b>Welterweight</b>up to 67 kg</span>
+      <span class="weight-chip"><b>Middleweight</b>up to 75 kg</span>
+      <span class="weight-chip"><b>Light heavyweight</b>up to 81 kg</span>
+      <span class="weight-chip"><b>Heavyweight</b>no upper limit</span>
+    </div>
+  </div>
+</section>
+
+<div class="ropes"></div>
+
+<section>
+  <div class="wrap">
+    <div class="split reverse">
+      <div class="split-text">
+        <h2>What goes on before the bell</h2>
+        <div class="prose">
+          <p>Long before a glove goes on, a boxer's hands are wrapped in metres of cotton and gauze, wound carefully around the knuckles, palm, and wrist. It looks like a formality, but it isn't — the small bones across the back of the hand are exactly what's most likely to break on a badly thrown punch, and a proper wrap is what keeps them aligned and supported through twelve rounds of full-force contact.</p>
+          <p>The gloves themselves go on over that, typically 8 to 10 ounces for professional bouts and slightly heavier for amateurs, with a distinct white "scoring area" across the knuckles in some competitions to help judges see a clean punch land. Add a mouthguard, and in amateur boxing a set of protective headgear, and a fighter is ready to step through the ropes.</p>
+        </div>
+      </div>
+      <div class="split-media">
+        <figure>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Boxers_wrap_their_hands_with_cloth_tape_prior_to_putting_on_boxing_gloves.jpg"
+               alt="A boxer's hands being wrapped in cloth tape before gloves go on"
+               loading="lazy">
+          <figcaption>Hand wraps go on well before the gloves — they're what actually protect the small bones of the hand. Photo: Wikimedia Commons</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ropes"></div>
+
+<section class="dark-section">
+  <div class="wrap">
+    <h2>The ring, the gloves, and the amateur game</h2>
+    <div class="prose" style="margin-bottom:2.2rem;">
+      <p>A boxing ring is almost always square despite the name — a raised platform, roped off on all four sides, usually between 4.9 and 7.3 metres to a side, with a red corner and a blue corner for the two fighters. Amateur boxing, the version fought at the Olympics and in most school and club competitions, uses shorter bouts and, in many divisions, protective headgear, putting the emphasis on speed and accuracy over the power that defines the professional ranks. Both versions run on the same core idea — they've just tuned the risk differently.</p>
+    </div>
+    <div class="gallery">
+      <figure class="gallery-tall">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Rio_2016_-_Boxe-Boxing._%2828477150604%29.jpg"
+             alt="Two amateur boxers competing in a bout at the 2016 Rio Olympics"
+             loading="lazy">
+        <figcaption>Amateur boxing at the 2016 Rio Olympics. Photo: Wikimedia Commons</figcaption>
+      </figure>
+      <figure class="gallery-tall">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Black_boxing_gloves.jpg"
+             alt="A pair of black leather boxing gloves"
+             loading="lazy">
+        <figcaption>A pair of boxing gloves — padded to protect the puncher as much as the punched. Photo: Wikimedia Commons</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <h2>Why people keep watching</h2>
+    <div class="prose">
+      <p>There's very little to hide behind in a boxing ring — no ball, no teammates, no equipment beyond a pair of gloves. Whatever happens in those three-minute rounds comes down to two people, their conditioning, their nerve, and how well they've studied each other. That starkness is exactly why a good fight can feel less like a sport and more like a story being told in real time, one round at a time, with nobody sure yet how it ends.</p>
+      <p><strong>None of this page is selling anything</strong> — it's simply an introduction to one of the oldest contests there is, between two people and nothing else.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Photographs: Wikimedia Commons contributors, used under their published licences.</span>
+    <span>A page about the sport, nothing more.</span>
+  </div>
+</footer>
+
+</body>
+</html>
